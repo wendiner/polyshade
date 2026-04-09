@@ -6,6 +6,7 @@
 // projection, flat shading, and UV mapping.
 
 #include <math.h>
+#include <stdio.h>
 #include "polyshade.h"
 
 void project(double* result, const struct xyz* a, const struct xyz* c, const struct xyz* t, const struct xyz* e) {
@@ -92,11 +93,54 @@ struct model* loadModel(char* filename) {
   fread(proto.mesh, sizeof(struct plane), proto.numPlanes, fp); // read planes from file into mesh
 
   struct model* final = (struct model*) malloc(sizeof(struct model)); // allocate memory for actual returned model
-  final* = proto;
+  *final = proto;
   return final;
 }
 
-void drawScene(const struct scene* scene, struct drawScene_opts* opts) {
-  al_clear_to_color(scene->bg_color);
+void drawScene(const struct scene* scene, struct drawScene_opts* opts, ALLEGRO_BITMAP* target) {
+  al_set_target_bitmap(target);
+  if (opts->flags & WIREFRAME == WIREFRAME) { // check if wireframe mode is enabled
+  al_clear_to_color(scene->bg_color); // clear screen
 
+    for (unsigned int i = 0; i < scene->numModels; i++) { // for each model...
+      struct model model = scene->models[i];
+
+      for (unsigned int j = 0; j < model.numPlanes; i++) { // for each triangle...
+        struct xyz vert1 = model.mesh[j].vert1; // get all 3 points
+        struct xyz vert2 = model.mesh[j].vert2;
+        struct xyz vert3 = model.mesh[j].vert3;
+
+        rotate(&vert1, &vert1, model.rot.x, model.rot.y, model.rot.z); // rotate points
+        rotate(&vert2, &vert2, model.rot.x, model.rot.y, model.rot.z);
+        rotate(&vert3, &vert3, model.rot.x, model.rot.y, model.rot.z);
+
+        vert1.x = vert1.x * model.scale + model.pos.x;
+        vert1.y = vert1.y * model.scale + model.pos.y;
+        vert1.z = vert1.z * model.scale + model.pos.z;
+
+        vert2.x = vert2.x * model.scale + model.pos.x;
+        vert2.y = vert2.y * model.scale + model.pos.y;
+        vert2.z = vert2.z * model.scale + model.pos.z;
+
+        vert3.x = vert3.x * model.scale + model.pos.x;
+        vert3.y = vert3.y * model.scale + model.pos.y;
+        vert3.z = vert3.z * model.scale + model.pos.z;
+
+        double xy1[2];
+        double xy2[2];
+        double xy3[2];
+
+        project(xy1, &(vert1), &(scene->camPos), &(scene->camRot), &(scene->dispOff));
+        project(xy2, &(vert2), &(scene->camPos), &(scene->camRot), &(scene->dispOff));
+        project(xy3, &(vert3), &(scene->camPos), &(scene->camRot), &(scene->dispOff));
+
+        printf("(%lf, %lf) to (%lf, %lf) to (%lf, %lf)\n", xy1[0], xy1[1], xy2[0], xy2[1], xy3[0], xy3[1]);
+        al_draw_filled_rectangle(50, 50, 100, 100, al_map_rgb(255, 0, 0));
+
+        al_draw_triangle(xy1[0], xy1[1], xy2[0], xy2[1], xy3[0], xy3[1], al_map_rgb(0, 255, 0), 1.0);
+      }
+    }
+  }
+
+  al_set_target_bitmap(NULL);
 }

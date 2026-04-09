@@ -33,9 +33,8 @@ struct scene { // represents a scene to be rendered
   struct model* models; // array of models
 };
 
-enum drawScene_FLAG { // see below
-  WIREFRAME = 1 // draw wireframe models only
-};
+// bit flags
+#define WIREFRAME 0x00000001
 
 struct drawScene_opts { // options for the drawScene function
   unsigned int flags; // 32-bit packed field
@@ -47,7 +46,7 @@ extern void rotate(const struct xyz* inp, struct xyz* out, double rx, double ry,
 // rotates a 3D vertex along the origin's axes
 extern struct model* loadModel(char* filename);
 // loads a model from a special .bin file, which itself was created from an .obj file by the "converter" program
-extern void drawScene(const struct scene* scene, struct drawScene_opts* opts);
+extern void drawScene(const struct scene* scene, struct drawScene_opts* opts, ALLEGRO_BITMAP* target);
 // renders a scene and all of its models
 
 #endif
