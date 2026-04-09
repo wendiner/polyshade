@@ -43,13 +43,13 @@ int main() {
       break;
 
     if (redraw && al_is_event_queue_empty(queue)) {
-      al_set_target_bitmap(NULL); 
+      ALLEGRO_BITMAP* target = al_clone_bitmap(al_get_backbuffer(disp));
       struct drawScene_opts opts = {
         .flags = WIREFRAME
       };
 
-      drawScene(&testScene, &opts, al_get_backbuffer(disp));
-      al_set_target_bitmap(al_get_backbuffer(disp));
+      drawScene(&testScene, &opts, target);
+      al_draw_bitmap(target, 0, 0, 0);
       al_draw_filled_rectangle(50, 50, 100, 100, al_map_rgb(255, 0, 0));
       al_flip_display();
 
