@@ -100,7 +100,7 @@ struct model* loadModel(char* filename) {
 void drawScene(const struct scene* scene, struct drawScene_opts* opts, ALLEGRO_BITMAP* target) {
   al_set_target_bitmap(target);
   if (opts->flags & WIREFRAME == WIREFRAME) { // check if wireframe mode is enabled
-  al_clear_to_color(scene->bg_color); // clear screen
+  // al_clear_to_color(scene->bg_color); // clear screen
 
     for (unsigned int i = 0; i < scene->numModels; i++) { // for each model...
       struct model model = scene->models[i];

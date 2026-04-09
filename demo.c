@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "polyshade.h"
 
 int main() {
@@ -34,7 +35,6 @@ int main() {
       case ALLEGRO_EVENT_TIMER:
         redraw = true;
         break;
-      case ALLEGRO_EVENT_KEY_DOWN:
       case ALLEGRO_EVENT_DISPLAY_CLOSE:
         done = true;
     }
@@ -50,6 +50,7 @@ int main() {
 
       drawScene(&testScene, &opts, al_get_backbuffer(disp));
       al_set_target_bitmap(al_get_backbuffer(disp));
+      al_draw_filled_rectangle(50, 50, 100, 100, al_map_rgb(255, 0, 0));
       al_flip_display();
 
       redraw = false;
