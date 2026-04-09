@@ -1,13 +1,14 @@
-// wireframe.c
+// polyshade.c
 // by wendiner, 2026
 // GNU General Public License v3.0
 //
-// Simple wireframe rasterizer.
+// 3D rasterizer with support for wireframe
+// projection, flat shading, and UV mapping.
 
 #include <math.h>
-#include "wireframe.h"
+#include "polyshade.h"
 
-void project(double* result, struct xyz* a, struct xyz* c, struct xyz* t, struct xyz* e) {
+void project(double* result, const struct xyz* a, const struct xyz* c, const struct xyz* t, const struct xyz* e) {
   // we first perform the "camera transform" to describe the target point relative to the camera
   struct xyz diff = {a->x - c->x, a->y - c->y, a->z - c->z};
   struct xyz cost = {cos(t->x), cos(t->y), cos(t->z)};
@@ -23,7 +24,7 @@ void project(double* result, struct xyz* a, struct xyz* c, struct xyz* t, struct
   result[1] = e->z / d.z * d.y + e->y;
 }
 
-void rotate(struct xyz* inp, struct xyz* out, double rx, double ry, double rz) {
+void rotate(const struct xyz* inp, struct xyz* out, double rx, double ry, double rz) {
   // rotation matrices for each axis
   double rmx[3][3] = {
     {1, 0, 0},
@@ -70,4 +71,32 @@ void rotate(struct xyz* inp, struct xyz* out, double rx, double ry, double rz) {
   out->x = new.x;
   out->y = new.y;
   out->z = new.z;
+}
+
+struct model* loadModel(char* filename) {
+  FILE* fp = fopen(filename, "rb");
+  if (!fp) // if file could not be opened, return null
+    return NULL;
+
+  for (int i = 0; i < 5; i++) // skip magic number ("MODEL")
+    fgetc(fp);
+
+  struct model proto = { // we use a separate struct to make initialization easier
+    .pos = {0},
+    .rot = {0},
+    .scale = 1.0
+  };
+
+  fread(&(proto.numPlanes), sizeof(unsigned int), 1, fp); // read the number of planes in file and copy to prototype
+  proto.mesh = (struct plane*) malloc(proto.numPlanes * sizeof(struct plane)); // allocate memory for mesh
+  fread(proto.mesh, sizeof(struct plane), proto.numPlanes, fp); // read planes from file into mesh
+
+  struct model* final = (struct model*) malloc(sizeof(struct model)); // allocate memory for actual returned model
+  final* = proto;
+  return final;
+}
+
+void drawScene(const struct scene* scene, struct drawScene_opts* opts) {
+  al_clear_to_color(scene->bg_color);
+
 }
